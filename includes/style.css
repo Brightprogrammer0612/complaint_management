@@ -1,0 +1,43 @@
+body {
+  display: flex;
+  height: 100vh;
+  margin: 0;
+  background-color: #f8f9fa;
+}
+
+h2 {
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.navbar-brand {
+  font-weight: bold;
+  color: #562500;
+}
+
+.btn {
+  margin-right: 5px;
+}
+
+.table {
+  background-color: #fff;
+}
+.sidebar {
+  width: 250px;
+  background-color: #f8f9fa;
+  padding: 15px;
+  position: fixed;
+  height: 100%;
+}
+.sidebar img {
+  height: 40px;
+  margin-bottom: 10px;
+}
+.content {
+  margin-left: 250px;
+  padding: 20px;
+  flex: 1;
+}
+.nav-link {
+  margin: 5px 0;
+}
