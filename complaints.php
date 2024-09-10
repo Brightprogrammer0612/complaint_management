@@ -5,49 +5,58 @@ include('./includes/header.php');
 include('./includes/db.php');
 
 if (isset($_POST['submit'])) {
-    echo "Form submitted!"; // Debugging line
-
-    $user_id = $_POST['user_id'];
+    $user_name = $_POST['user_name'];  
     $type = $_POST['type'];
     $status = $_POST['status'];
-    
-    echo "User ID: $user_id"; // Debugging line
-    
+    $description = $_POST['description'];
+
     try {
-        // Check if user_id exists in the users table
-        $checkUserQuery = "SELECT id FROM users WHERE id = ?";
+        $checkUserQuery = "SELECT id FROM users WHERE username = ?";
         $checkStmt = $conn->prepare($checkUserQuery);
         if (!$checkStmt) {
             throw new Exception("Prepare failed: " . $conn->error);
         }
-        $checkStmt->bind_param("i", $user_id); // User ID is an integer
+
+        $checkStmt->bind_param("s", $user_name);  
         $checkStmt->execute();
         $checkStmt->store_result();
-
+        
         if ($checkStmt->num_rows > 0) {
-            // If user exists, insert the complaint
-            $query = "INSERT INTO complaints (user_id, type, status) VALUES (?, ?, ?)";
+            $checkStmt->bind_result($user_id);
+            $checkStmt->fetch();
+
+            $query = "INSERT INTO complaints (user_id, type, status, description) VALUES (?, ?, ?, ?)";
             $stmt = $conn->prepare($query);
             if (!$stmt) {
                 throw new Exception("Prepare failed: " . $conn->error);
             }
-            $stmt->bind_param("iss", $user_id, $type, $status); // Corrected parameter types (int for user_id)
+
+            $stmt->bind_param("isss", $user_id, $type, $status, $description);  
             if (!$stmt->execute()) {
                 throw new Exception("Execute failed: " . $stmt->error);
             }
+
             $stmt->close();
             echo "Complaint submitted successfully!";
         } else {
-            echo "Error: User ID $user_id does not exist in the users table.";
+            echo "Error: User Name $user_name does not exist in the users table.";
         }
-
         $checkStmt->close();
-        
     } catch (Exception $e) {
         echo "Error: " . $e->getMessage();
     }
-    
 }
+
+$complaintsQuery = "SELECT complaints.id, users.username as user, complaints.type, complaints.status, complaints.description FROM complaints 
+    INNER JOIN users ON complaints.user_id = users.id";
+$complaintsResult = $conn->query($complaintsQuery);
+$complaints = [];
+if ($complaintsResult->num_rows > 0) {
+    while ($row = $complaintsResult->fetch_assoc()) {
+        $complaints[] = $row;
+    }
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -77,10 +86,6 @@ if (isset($_POST['submit'])) {
       background-color: #343a40;
     }
 
-    .form-control {
-      max-width: 400px;
-    }
-
     #sidebar {
       background-color: #f8f9fa;
       min-height: 100vh;
@@ -92,59 +97,6 @@ if (isset($_POST['submit'])) {
       width: 240px;
     }
 
-    #sidebar .title {
-      display: flex;
-      align-items: center;
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    #sidebar .title img {
-      max-width: 100px;
-      margin-right: 10px;
-    }
-
-    #sidebar .title h5 {
-      font-size: 1.5rem;
-      margin: 0;
-    }
-
-    #sidebar .title p {
-      margin: 0;
-      font-size: 0.875rem;
-    }
-
-    #sidebar .nav-link {
-      color: #333;
-      padding: 15px;
-      text-decoration: none;
-      display: block;
-    }
-
-    #sidebar .nav-link.active {
-      background-color: #1abc9c;
-      color: white;
-    }
-
-    #sidebar .nav-link:hover {
-      background-color: #1abc9c;
-      color: white;
-    }
-
-    .content {
-      margin-left: 240px; 
-      padding: 20px;
-    }
-
-    .navbar-custom {
-      background-color: #1abc9c;
-    }
-
-    .navbar-custom .navbar-brand, 
-    .navbar-custom .navbar-text, 
-    .navbar-custom .navbar-nav .nav-link {
-      color: white;
-    }
     .content {
       margin-left: 240px; 
       padding: 20px;
@@ -158,16 +110,16 @@ if (isset($_POST['submit'])) {
       background-color: #1abc9c;
       color: white;
     }
+
     .table-hover tbody tr:hover {
       background-color: #f1f1f1;
     }
-
   </style>
 </head>
- <body class="light-theme">
-    <div id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar">
+<body class="light-theme">
+  <div id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar" style="display: none !important;">
     <div class="title">
-      <img src="./assets/images/logo.png" alt="Company Logo" width="40" height="40"> 
+      <img src="./assets/images/logo.png" alt="Company Logo" width="40" height="40">
       <div>
         <h6>Complaint Management</h6>
         <p>Simple | Reliable | Efficient</p>
@@ -197,75 +149,79 @@ if (isset($_POST['submit'])) {
         </li>
       </ul>
     </div>
-  </div>   
-
-<main class="content" style="width: 82%;">
-  <div class="card mb-4" >
-    <div class="card-header">
-      <h5>Add New Complaint</h5>
-    </div>
-    <div class="card-body">
-      <form action="./complaints.php" method="POST">
-        <div class="mb-3">
-          <label for="user_id" class="form-label">User ID</label>
-          <input type="number" class="form-control" id="user_id" name="user_id" required>
-        </div>
-        <div class="mb-3">
-          <label for="type" class="form-label">Complaint Type</label>
-          <input type="text" class="form-control" id="type" name="type" required>
-        </div>
-        <div class="mb-3">
-          <label for="status" class="form-label">Complaint Status</label>
-          <input type="text" class="form-control" id="status" name="status" required>
-        </div>
-        <button type="submit" name="submit" class="btn btn-custom">Submit Complaint</button>
-      </form>
-    </div>
   </div>
 
-  <div class="card">
-    <div class="card-header">
-      <h5>Complaints List</h5>
+  <main class="content" style="width: 82%;">
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5>Add New Complaint</h5>
+      </div>
+      <div class="card-body">
+        <form action="./complaints.php" method="POST">
+          <div class="mb-3">
+            <label for="user_name" class="form-label">User Name</label>
+            <input type="text" class="form-control" id="user_name" name="user_name" required>
+          </div>
+          <div class="mb-3">
+            <label for="type" class="form-label">Complaint Type</label>
+            <input type="text" class="form-control" id="type" name="type" required>
+          </div>
+          <div class="mb-3">
+            <label for="status" class="form-label">Complaint Status</label>
+            <input type="text" class="form-control" id="status" name="status" required>
+          </div>
+          <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="description" required></textarea>
+          </div>
+          <button type="submit" name="submit" class="btn btn-custom">Submit Complaint</button>
+        </form>
+      </div>
     </div>
-    <div class="card-body">
-      <table class="table table-hover">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>User</th>
-            <th>Type</th>
-            <th>Status</th>
-            <th>Description</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php if (!empty($complaints)): ?>
-            <?php foreach ($complaints as $complaint): ?>
-              <tr>
-                <td><?= htmlspecialchars($complaint['id']) ?></td>
-                <td><?= htmlspecialchars($complaint['user_id']) ?></td>
-                <td><?= htmlspecialchars($complaint['type']) ?></td>
-                <td><?= htmlspecialchars($complaint['status']) ?></td>
-                <td><?= htmlspecialchars($complaint['description']) ?></td>
-                <td>
-                  <a href="edit_complaint.php?id=<?= htmlspecialchars($complaint['id']) ?>" class="btn btn-sm btn-warning">Edit</a>
-                  <a href="delete_complaint.php?id=<?= htmlspecialchars($complaint['id']) ?>" class="btn btn-sm btn-danger">Delete</a>
-                </td>
-              </tr>
-            <?php endforeach; ?>
-          <?php else: ?>
+
+    <div class="card">
+      <div class="card-header">
+        <h5>Complaints List</h5>
+      </div>
+      <div class="card-body">
+        <table class="table table-hover">
+          <thead>
             <tr>
-              <td colspan="6">No complaints found.</td>
+              <th>ID</th>
+              <th>User</th>
+              <th>Type</th>
+              <th>Status</th>
+              <th>Description</th>
+              <th>Actions</th>
             </tr>
-          <?php endif; ?>
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            <?php if (!empty($complaints)): ?>
+              <?php foreach ($complaints as $complaint): ?>
+                <tr>
+                  <td><?= htmlspecialchars($complaint['id']) ?></td>
+                  <td><?= htmlspecialchars($complaint['user']) ?></td>
+                  <td><?= htmlspecialchars($complaint['type']) ?></td>
+                  <td><?= htmlspecialchars($complaint['status']) ?></td>
+                  <td><?= htmlspecialchars($complaint['description']) ?></td>
+                  <td>
+                    <a href="edit_complaint.php?id=<?= htmlspecialchars($complaint['id']) ?>" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="delete_complaint.php?id=<?= htmlspecialchars($complaint['id']) ?>" class="btn btn-sm btn-danger">Delete</a>
+                  </td>
+                </tr>
+              <?php endforeach; ?>
+            <?php else: ?>
+              <tr>
+                <td colspan="6">No complaints found.</td>
+              </tr>
+            <?php endif; ?>
+          </tbody>
+        </table>
+      </div>
     </div>
-  </div>
-</main>
+  </main>
 
-<script src="./bootstrap-5.3.2-dist/bootstrap-5.3.2-dist/js/bootstrap.min.js"></script>
+  <script src="./bootstrap-5.3.2-dist/bootstrap-5.3.2-dist/js/bootstrap.min.js"></script>
 </body>
 </html>
 

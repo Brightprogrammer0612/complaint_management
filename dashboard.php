@@ -65,7 +65,6 @@ if (!isset($_SESSION['username'])) {
       max-width: 100px;
       margin-right: 10px;
     }
-
     #sidebar .title h5 {
       font-size: 1.5rem;
       margin: 0;
