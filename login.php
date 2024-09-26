@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <!-- Bootstrap CSS -->
     <link href="./bootstrap-5.3.2-dist/bootstrap-5.3.2-dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -46,7 +45,6 @@
 <body>
     <div class="login-container">
         <h2>Login</h2>
-        <!-- Display error message -->
         <?php if (isset($_GET['error'])) { ?>
             <div class="alert alert-danger" role="alert">
                 <?php echo $_GET['error']; ?>

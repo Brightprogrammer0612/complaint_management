@@ -1,23 +1,19 @@
 <?php
-// Start output buffering
 ob_start(); 
 session_start();
 include('./includes/db.php');
 include('./includes/header.php');
 
-// Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
     header("Location: ./login.php");
     exit();
 }
 
-// Check if user role is set
 if (!isset($_SESSION['role'])) {
     echo "Access denied! User role not defined.";
     exit();
 }
 
-// Check if the user has admin role
 if ($_SESSION['role'] !== 'admin') {
     echo "Access denied! You do not have sufficient permissions.";
     exit();
@@ -31,7 +27,7 @@ try {
     exit();
 }
 
-ob_end_flush(); // Flush output buffer and send output
+ob_end_flush(); 
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -42,7 +38,6 @@ ob_end_flush(); // Flush output buffer and send output
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        /* Custom styles */
         body {
             background-color: #f5f5f5;
         }
@@ -68,27 +63,27 @@ ob_end_flush(); // Flush output buffer and send output
             padding-top: 20px;
             color: white;
         }
-        #sidebar .title {
-      display: flex;
-      align-items: center;
-      text-align: center;
-      margin-bottom: 20px;
-    }
+          #sidebar .title {
+          display: flex;
+          align-items: center;
+          text-align: center;
+          margin-bottom: 20px;
+        }
 
-    #sidebar .title img {
-      max-width: 100px;
-      margin-right: 10px;
-    }
+        #sidebar .title img {
+          max-width: 100px;
+          margin-right: 10px;
+        }
 
-    #sidebar .title h5 {
-      font-size: 1.5rem;
-      margin: 0;
-    }
+        #sidebar .title h5 {
+          font-size: 1.5rem;
+          margin: 0;
+        }
 
-    #sidebar .title p {
-      margin: 0;
-      font-size: 0.875rem;
-    }
+        #sidebar .title p {
+          margin: 0;
+          font-size: 0.875rem;
+        }
         .sidebar .nav-link {
             color: white;
             margin: 10px 0;
@@ -114,12 +109,10 @@ ob_end_flush(); // Flush output buffer and send output
     </style>
 </head>
 <body>
-
-<!-- Sidebar for navigation -->
 <div>
 <div id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar">
     <div class="title">
-      <img src="./assets/images/logo.png" alt="Company Logo" width="40" height="40"> <!-- Replace with actual logo path -->
+      <img src="./assets/images/logo.png" alt="Company Logo" width="40" height="40"> 
       <div>
         <h6>Complaint Management</h6>
         <p>Simple | Reliable | Efficient</p>
@@ -151,7 +144,6 @@ ob_end_flush(); // Flush output buffer and send output
     </div>
   </div>
 
-    <!-- Main content section -->
     <div class="container mt-4 content">
         <h2>User Management</h2>
         <table class="table table-hover">

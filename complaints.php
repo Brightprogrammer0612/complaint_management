@@ -117,7 +117,7 @@ if ($complaintsResult->num_rows > 0) {
   </style>
 </head>
 <body class="light-theme">
-  <div id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar" style="display: none !important;">
+  <div id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar">
     <div class="title">
       <img src="./assets/images/logo.png" alt="Company Logo" width="40" height="40">
       <div>
@@ -150,7 +150,6 @@ if ($complaintsResult->num_rows > 0) {
       </ul>
     </div>
   </div>
-
   <main class="content" style="width: 82%;">
     <div class="card mb-4">
       <div class="card-header">
@@ -178,7 +177,6 @@ if ($complaintsResult->num_rows > 0) {
         </form>
       </div>
     </div>
-
     <div class="card">
       <div class="card-header">
         <h5>Complaints List</h5>
@@ -205,8 +203,12 @@ if ($complaintsResult->num_rows > 0) {
                   <td><?= htmlspecialchars($complaint['status']) ?></td>
                   <td><?= htmlspecialchars($complaint['description']) ?></td>
                   <td>
-                    <a href="edit_complaint.php?id=<?= htmlspecialchars($complaint['id']) ?>" class="btn btn-sm btn-warning">Edit</a>
-                    <a href="delete_complaint.php?id=<?= htmlspecialchars($complaint['id']) ?>" class="btn btn-sm btn-danger">Delete</a>
+                    <a href="edit_complaint.php?id=<?= htmlspecialchars($complaint['id']) ?>" class="btn btn-sm btn-warning">
+                      <i class="bi bi-pencil"></i> Edit
+                    </a>
+                    <a href="delete_complaint.php?id=<?= htmlspecialchars($complaint['id']) ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this complaint?')">
+                      <i class="bi bi-trash"></i> Delete
+                    </a>
                   </td>
                 </tr>
               <?php endforeach; ?>
@@ -220,7 +222,6 @@ if ($complaintsResult->num_rows > 0) {
       </div>
     </div>
   </main>
-
   <script src="./bootstrap-5.3.2-dist/bootstrap-5.3.2-dist/js/bootstrap.min.js"></script>
 </body>
 </html>

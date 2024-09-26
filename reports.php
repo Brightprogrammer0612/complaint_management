@@ -37,7 +37,6 @@ try {
     echo "Error: " . $e->getMessage();
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -134,7 +133,6 @@ try {
             </ul>
         </div>
     </div>
-
     <main class="content" style="height: 79vh;">
         <div class="container mt-4">
             <h2>Reports</h2>
@@ -177,9 +175,7 @@ try {
             </table>
         </div>
     </main>
-
     <?php include './includes/footer.php'; ?>
-
     <script src="./bootstrap-5.3.2-dist/bootstrap-5.3.2-dist/js/bootstrap.min.js"></script>
 </body>
 </html>

@@ -1,25 +1,45 @@
 <?php
-session_start();
+include ('./includes/header.php');
+include('./includes/db.php');
 
-if (!isset($_SESSION['username'])) {
-    header("Location: ./login.php");
-    exit();
+if (isset($_GET['id'])) {
+    $complaint_id = $_GET['id'];
+    
+    if (isset($_POST['update'])) {
+        $type = $_POST['type'];
+        $status = $_POST['status'];
+        $description = $_POST['description'];
+        
+        $updateQuery = "UPDATE complaints SET type = ?, status = ?, description = ? WHERE id = ?";
+        $stmt = $conn->prepare($updateQuery);
+        $stmt->bind_param("sssi", $type, $status, $description, $complaint_id);
+        
+        if ($stmt->execute()) {
+            echo "Complaint updated successfully!";
+            header("Location: ./complaints.php");
+        } else {
+            echo "Error updating complaint.";
+        }
+    }
+
+    $complaintQuery = "SELECT * FROM complaints WHERE id = ?";
+    $stmt = $conn->prepare($complaintQuery);
+    $stmt->bind_param("i", $complaint_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $complaint = $result->fetch_assoc();
 }
 ?>
 
-<?php include './includes/header.php'; ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Online Complaint Management System</title>
+  <title>Edit Complaint</title>
   <link href="./bootstrap-5.3.2-dist/bootstrap-5.3.2-dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-  <link href="../css/style.css" rel="stylesheet">
-
   <style>
-    body.light-theme {
+  body.light-theme {
       background-color: #ffffff;
       color: #000000;
     }
@@ -104,20 +124,10 @@ if (!isset($_SESSION['username'])) {
     .navbar-custom .navbar-nav .nav-link {
       color: white;
     }
-
-    .greeting {
-      text-align: center;
-      margin-top: 100px;
-    }
-
-    .greeting img {
-      max-width: 300px;
-      margin-bottom: 20px;
-    }
-  </style>
+    </style>
 </head>
-<body class="light-theme">
-  <div id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar">
+<body>
+<div id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar">
     <div class="title">
       <img src="./assets/images/logo.png" alt="Company Logo" width="40" height="40"> 
       <div>
@@ -150,16 +160,26 @@ if (!isset($_SESSION['username'])) {
       </ul>
     </div>
   </div>
-
-  <div class="content">
-    <div class="greeting">
-      <h1>Hi there!</h1>
-      <p>Dashboard, shortcuts, and analytics will come soon.</p>
-      <img src="../complaint_management/assets/images/Landing_Page-removebg-preview.png" alt="Placeholder image">
-    </div>
+  <main class="content" >
+  <div class="container mt-5">
+    <h3>Edit Complaint</h3>
+    <form action="" method="POST">
+      <div class="mb-3">
+        <label for="type" class="form-label">Complaint Type</label>
+        <input type="text" class="form-control" id="type" name="type" value="<?= htmlspecialchars($complaint['type']) ?>" required>
+      </div>
+      <div class="mb-3">
+        <label for="status" class="form-label">Complaint Status</label>
+        <input type="text" class="form-control" id="status" name="status" value="<?= htmlspecialchars($complaint['status']) ?>" required>
+      </div>
+      <div class="mb-3">
+        <label for="description" class="form-label">Description</label>
+        <textarea class="form-control" id="description" name="description" required><?= htmlspecialchars($complaint['description']) ?></textarea>
+      </div>
+      <button type="submit" name="update" class="btn btn-primary">Update Complaint</button>
+    </form>
   </div>
-
-  <script src="./bootstrap-5.3.2-dist/bootstrap-5.3.2-dist/js/bootstrap.min.js"></script>
+  </main>
 </body>
 </html>
 <?php include './includes/footer.php'; ?>
